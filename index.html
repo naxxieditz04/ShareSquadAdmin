@@ -1,118 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Panel - Add Group</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>👨‍💼 Admin Dashboard</h1>
-  <button onclick="logout()">Logout</button>
-
-  <h2>Add New Group</h2>
-  <input type="text" id="groupName" placeholder="Group Name"><br>
-  <input type="text" id="groupDesc" placeholder="Description"><br>
-  <input type="text" id="groupLink" placeholder="Group Link"><br>
-  <input type="text" id="groupCategory" placeholder="Category"><br>
-  <button onclick="addGroup()">Add Group</button>
-
-  <h2>📋 All Groups</h2>
-  <div id="groupList"></div>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-  <script>
-    // 🔧 Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBCwoxp278aud76u5pFE7mkqfiQL2T8S0s",
-      authDomain: "grouplinkapp.firebaseapp.com",
-      projectId: "grouplinkapp"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // ✅ Check if admin is logged in
-    auth.onAuthStateChanged((user) => {
-      if (!user) {
-        alert("Please login first.");
-        window.location.href = "login.html";
-      } else {
-        loadGroups();
-      }
-    });
-
-    // ➕ Add Group
-    function addGroup() {
-      const name = document.getElementById("groupName").value;
-      const desc = document.getElementById("groupDesc").value;
-      const link = document.getElementById("groupLink").value;
-      const category = document.getElementById("groupCategory").value;
-
-      if (!name || !desc || !link || !category) {
-        alert("Please fill all fields.");
-        return;
-      }
-
-      db.collection("groups").add({
-        name,
-        description: desc,
-        link,
-        category,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert("Group added!");
-        document.getElementById("groupName").value = "";
-        document.getElementById("groupDesc").value = "";
-        document.getElementById("groupLink").value = "";
-        document.getElementById("groupCategory").value = "";
-        loadGroups();
-      });
-    }
-
-    // 📋 Load Group List
-    function loadGroups() {
-      const container = document.getElementById("groupList");
-      container.innerHTML = "Loading...";
-      db.collection("groups").orderBy("createdAt", "desc").get()
-        .then(snapshot => {
-          container.innerHTML = "";
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            const div = document.createElement("div");
-            div.innerHTML = `
-              <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
-                <b>${data.name}</b> [${data.category}]<br>
-                <small>${data.description}</small><br>
-                <a href="${data.link}" target="_blank">Join Group</a><br>
-                <button onclick="deleteGroup('${doc.id}')">Delete</button>
-              </div>
-            `;
-            container.appendChild(div);
-          });
-        });
-    }
-
-    // 🗑️ Delete Group
-    function deleteGroup(id) {
-      if (confirm("Delete this group?")) {
-        db.collection("groups").doc(id).delete()
-          .then(() => {
-            alert("Deleted!");
-            loadGroups();
-          });
-      }
-    }
-
-    // 🚪 Logout
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-  </script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Admin Panel for Group Links" />
+    <title>Group Links Admin</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
 </html>
